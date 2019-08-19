@@ -67,7 +67,7 @@ class LTI_Data_Connector_MySQL extends LTI_Data_Connector {
   public function Tool_Consumer_load($consumer) {
 
     $ok = FALSE;
-    $sql = sprintf('SELECT name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
+    $sql = sprintf('SELECT name, email_domain, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
                    "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' ' .
                    "WHERE consumer_key = %s",
        LTI_Data_Connector::quoted($consumer->getKey()));
@@ -76,6 +76,7 @@ class LTI_Data_Connector_MySQL extends LTI_Data_Connector {
       $row = mysql_fetch_object($rs_consumer);
       if ($row) {
         $consumer->name = $row->name;
+        $consumer->email_domain = $row->email_domain;
         $consumer->secret = $row->secret;
         $consumer->lti_version = $row->lti_version;
         $consumer->consumer_name = $row->consumer_name;
@@ -138,21 +139,36 @@ class LTI_Data_Connector_MySQL extends LTI_Data_Connector {
     }
     if (is_null($consumer->created)) {
       $sql = sprintf("INSERT INTO {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' (consumer_key, name, ' .
-             'secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated) ' .
-             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, {$protected}, {$enabled}, %s, %s, %s, '{$now}', '{$now}')",
-         LTI_Data_Connector::quoted($consumer->getKey()), LTI_Data_Connector::quoted($consumer->name),
-         LTI_Data_Connector::quoted($consumer->secret), LTI_Data_Connector::quoted($consumer->lti_version),
-         LTI_Data_Connector::quoted($consumer->consumer_name), LTI_Data_Connector::quoted($consumer->consumer_version), LTI_Data_Connector::quoted($consumer->consumer_guid),
-         LTI_Data_Connector::quoted($consumer->css_path), LTI_Data_Connector::quoted($from), LTI_Data_Connector::quoted($until), LTI_Data_Connector::quoted($last));
+             'email_domain, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated) ' .
+             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, {$protected}, {$enabled}, %s, %s, %s, '{$now}', '{$now}')",
+        LTI_Data_Connector::quoted($consumer->getKey()), 
+        LTI_Data_Connector::quoted($consumer->name),
+        LTI_Data_Connector::quoted($consumer->email_domain), 
+        LTI_Data_Connector::quoted($consumer->secret), 
+        LTI_Data_Connector::quoted($consumer->lti_version),
+        LTI_Data_Connector::quoted($consumer->consumer_name), 
+        LTI_Data_Connector::quoted($consumer->consumer_version), 
+        LTI_Data_Connector::quoted($consumer->consumer_guid),
+        LTI_Data_Connector::quoted($consumer->css_path), 
+        LTI_Data_Connector::quoted($from), 
+        LTI_Data_Connector::quoted($until), 
+        LTI_Data_Connector::quoted($last));
     } else {
       $sql = sprintf("UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' SET ' .
-               'name = %s, secret= %s, lti_version = %s, consumer_name = %s, consumer_version = %s, consumer_guid = %s, ' .
+               'name = %s, email_domain= %s, secret= %s, lti_version = %s, consumer_name = %s, consumer_version = %s, consumer_guid = %s, ' .
                "css_path = %s, protected = {$protected}, enabled = {$enabled}, enable_from = %s, enable_until = %s, last_access = %s, updated = '{$now}' " .
              "WHERE consumer_key = %s",
          LTI_Data_Connector::quoted($consumer->name),
-         LTI_Data_Connector::quoted($consumer->secret), LTI_Data_Connector::quoted($consumer->lti_version),
-         LTI_Data_Connector::quoted($consumer->consumer_name), LTI_Data_Connector::quoted($consumer->consumer_version), LTI_Data_Connector::quoted($consumer->consumer_guid),
-         LTI_Data_Connector::quoted($consumer->css_path), LTI_Data_Connector::quoted($from), LTI_Data_Connector::quoted($until), LTI_Data_Connector::quoted($last),
+         LTI_Data_Connector::quoted($consumer->email_domain),
+         LTI_Data_Connector::quoted($consumer->secret),
+         LTI_Data_Connector::quoted($consumer->lti_version),
+         LTI_Data_Connector::quoted($consumer->consumer_name),
+         LTI_Data_Connector::quoted($consumer->consumer_version),
+         LTI_Data_Connector::quoted($consumer->consumer_guid),
+         LTI_Data_Connector::quoted($consumer->css_path),
+         LTI_Data_Connector::quoted($from),
+         LTI_Data_Connector::quoted($until),
+         LTI_Data_Connector::quoted($last),
          LTI_Data_Connector::quoted($consumer->getKey()));
     }
     $ok = mysql_query($sql);

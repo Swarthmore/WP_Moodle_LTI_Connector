@@ -1,7 +1,7 @@
 <?php
 /**
  * LTI_Tool_Provider - PHP class to include in an external tool to handle connections with an LTI 1 compliant tool consumer
- * Copyright (C) 2015  Stephen P Vickers
+ * Copyright (C) 2019  devnoot
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,44 +20,7 @@
  * Contact: stephen@spvsoftwareproducts.com
  *
  * Version history:
- *   2.0.00  30-Jun-12  Initial release (replacing version 1.1.01 of BasicLTI_Tool_Provider)
- *   2.1.00   3-Jul-12  Added option to restrict use of consumer key based on tool consumer GUID value
- *                      Added field to record day of last access for each consumer key
- *   2.2.00  16-Oct-12  Added option to return parameters sent in last extension request
- *                      Released under GNU Lesser General Public License, version 3
- *   2.3.00   2-Jan-13  Removed autoEnable property from LTI_Tool_Provider class (including constructor parameter)
- *                      Added LTI_Tool_Provider->setParameterConstraint() method
- *                      Changed references to $_REQUEST to $_POST
- *                      Added LTI_Tool_Consumer->getIsAvailable() method
- *                      Deprecated LTI_Context (use LTI_Resource_Link instead), other references to Context deprecated in favour of Resource_Link
- *   2.3.01   2-Feb-13  Added error callback option to LTI_Tool_Provider class
- *                      Fixed typo in setParameterConstraint function
- *                      Updated to use latest release of OAuth dependent library
- *                      Added message property to LTI_Tool_Provider class to override default message returned on error
- *   2.3.02  18-Apr-13  Tightened up checking of roles - now case sensitive and checks fully qualified URN
- *                      Fixed bug with not updating a resource link before redirecting to a shared resource link
- *   2.3.03   5-Jun-13  Altered order of checks in authenticate
- *                      Fixed bug with LTI_Resource_Link->doOutcomesService when a resource link is shared with a different tool consumer
- *                      Separated LTI_User from LTI_Outcome object
- *                      Fixed bug with returned outcome values of zero
- *   2.3.04  13-Aug-13  Ensure nonce values are no longer than 32 characters
- *   2.3.05  29-Jul-14  Added support for ContentItemSelectionRequest message
- *                      Accepts messages with an lti_version of LTI-2p0
- *                      Added data connector for Oracle
- *   2.3.06   5-Aug-14  Fixed bug with OCI data connector
- *   2.4.00  10-Apr-15  Added class methods as alternatives to callbacks
- *                      Added methods for generating signed auto-submit forms for LTI messages
- *                      Added classes for Content-item objects
- *                      Added support for unofficial ConfigureLaunchRequest and DashboardRequest messages
- *   2.5.00  20-May-15  Added LTI_HTTP_Message class to handle the sending of HTTP requests
- *                      Added workflow for automatically assigning resource link ID on first launch of a content-item message created link
- *                      Enhanced checking of parameter values
- *                      Added mediaTypes and documentTargets properties to LTI_Tool_Provider class for ContentItemSelectionRequest messages
- *   2.5.01  11-Mar-16  Fixed bug with saving User before ResourceLink in LTI_Tool_Provider->authenticate()
- *                      Fixed bug with creating a MySQL data connector when a database connector is passed to getDataConnector()
- *                      Added check in OAuth.php that query string is set before extracting the GET parameters
- *                      Added check for incorrect version being passed in lti_version parameter
- */
+ *   1.0.0  ??-Aug-19  Initial release
 
 /**
  * OAuth library file
@@ -109,6 +72,10 @@ class LTI_Tool_Provider {
  * Prefix the ID with the consumer key and resource ID.
  */
   const ID_SCOPE_RESOURCE = 3;
+/**
+ * Base Id on user email address.
+ */
+  const ID_SCOPE_GLOBAL_EMAIL_ID = 4;
 /**
  * Character used to separate each element of an ID.
  */
@@ -526,6 +493,10 @@ EOD;
 ### Callback function may return HTML, a redirect URL, or a boolean value
 #
       if (is_string($result)) {
+        
+        //Swat Edit to make sure user can edit while WP-Admin has forced SSL
+        $result = str_replace("https://", "http://", $result);
+    
         if ((substr($result, 0, 7) == 'http://') || (substr($result, 0, 8) == 'https://')) {
           $this->redirectURL = $result;
         } else {
@@ -3022,6 +2993,11 @@ class LTI_User {
           $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->resource_link->lti_resource_id;
         }
         $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->id;
+        break;
+      //Swat Edit: added case for email based ID
+      case LTI_Tool_Provider::ID_SCOPE_GLOBAL_EMAIL_ID:
+        $email = $this->email;
+        $id = substr( $email, 0, strpos($email,'@'));
         break;
       default:
         $id = $this->id;
