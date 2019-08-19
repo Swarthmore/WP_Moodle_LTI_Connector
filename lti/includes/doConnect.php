@@ -35,7 +35,6 @@
 function lti_do_connect($tool_provider) {
 
   global $lti_db_connector;
-  //global $wpdb;
 
   // If multisite support isn't in play, go home
   if (!is_multisite()) {
@@ -63,7 +62,6 @@ function lti_do_connect($tool_provider) {
   $options = get_site_option('lti_choices');
   $scope_userid = lti_get_scope($tool_provider->consumer->getKey());
   $user_login = $tool_provider->user->getID($scope_userid);
-  
   
   //Swat edit:
 	$idLoc = strpos(print_r($tool_provider->user,true), '[id:LTI_User:private] =>');

@@ -34,11 +34,10 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . DIRECTORY_S
 require_once('lib.php');
 
 global $lti_db_connector;
-global $wpdb;
 
 if (!empty($_POST) && check_admin_referer('add_lti', '_wpnonce_add_lti')) {
 
-  $consumer = new LTI_Tool_Consumer($_POST['lti_key'], $lti_db_connector);
+  $consumer               = new LTI_Tool_Consumer($_POST['lti_key'], $lti_db_connector);
   $consumer->name         = $_POST['lti_name'];
   $consumer->email_domain = $_POST['lti_email_domain'];
   $consumer->enabled      = (isset($_POST['lti_enabled']) && ($_POST['lti_enabled'] == 'true')) ? TRUE : FALSE;
