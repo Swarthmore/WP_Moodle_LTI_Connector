@@ -260,8 +260,6 @@ class OAuthRequest {
               : 'https';
     $http_url = ($http_url) ? $http_url : $scheme .
                               '://' . $_SERVER['SERVER_NAME'] .
-                              ':' .
-                              $_SERVER['SERVER_PORT'] .
                               $_SERVER['REQUEST_URI'];
     $http_method = ($http_method) ? $http_method : $_SERVER['REQUEST_METHOD'];
 
