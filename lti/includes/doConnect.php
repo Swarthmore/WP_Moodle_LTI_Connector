@@ -34,7 +34,8 @@
  *-----------------------------------------------------------------*/
 function lti_do_connect($tool_provider) {
 
-  global $wpdb;
+  global $lti_db_connector;
+  //global $wpdb;
 
   // If multisite support isn't in play, go home
   if (!is_multisite()) {
@@ -79,7 +80,7 @@ function lti_do_connect($tool_provider) {
 			$tool_provider->reason="No Moodle ID";
 			return FALSE;
 		}
-	error_log("!!!!!!!!!!!!!!!!!! Incoming Moodle User !!!!!!!!!!!!!!!!!!" . $moodleID);
+	//error_log("!!!!!!!!!!!!!!!!!! Incoming Moodle User !!!!!!!!!!!!!!!!!!" . $moodleID);
 
   // Sanitize username stripping out unsafe characters
   $user_login = sanitize_user($user_login);
@@ -94,14 +95,13 @@ function lti_do_connect($tool_provider) {
 
 	list($emailUsername, $emailDomain) = explode('@', $tool_provider->user->email);
 	if ($emailDomain !== $defaultEmailDomain){
-		error_log("!!!!!!!!!!!!!!!!!! default domain is !!!!!!!!!!!!!!!!!!" . $defaultEmailDomain);
-		error_log("!!!!!!!!!!!!!!!!!!Not from default domain!!!!!!!!!!!!!!!!!!");
+		// error_log("!!!!!!!!!!!!!!!!!! default domain is !!!!!!!!!!!!!!!!!!" . $defaultEmailDomain);
+		// error_log("!!!!!!!!!!!!!!!!!!Not from default domain!!!!!!!!!!!!!!!!!!");
     $user_login= $user_login . '-' . $moodleID;
   }
     
   // Check if this username, $user_login, is already defined
   $user = get_user_by('login', $user_login);
-
 
 	if (!filter_var($tool_provider->user->email, FILTER_VALIDATE_EMAIL) || in_array($user_login, $banned_users))  {
 		wp_logout();

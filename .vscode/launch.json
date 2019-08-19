@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "name": "Listen for XDebug",
+          "type": "php",
+          "request": "launch",
+          "port": 9001,
+          "pathMappings": {
+              "/usr/local/var/www/html/wordpress": "/usr/local/var/www/html/wordpress/wp-content/plugins/lti"
+          }
+      }
+  ]
+}

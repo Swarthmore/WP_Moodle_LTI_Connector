@@ -185,8 +185,8 @@ class LTI_List_Table extends WP_List_Table {
    * @uses $this->set_pagination_args()
    ---------------------------------------------------------------*/
   function prepare_items($per_page) {
-    global $wpdb;
-    //global $lti_db_connector;
+    //global $wpdb;
+    global $lti_db_connector;
 
     /**
      * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -217,7 +217,7 @@ class LTI_List_Table extends WP_List_Table {
       * Get all the consumers and convert in array for this class to process
       */
 
-     $tool = new LTI_Tool_Provider('', array($wpdb->base_prefix));
+     $tool = new LTI_Tool_Provider('', $lti_db_connector);
      $lti_data = $tool->getConsumers();
      for($i = 0; $i < count($lti_data); $i++) {
        $data[$i]['ID'] = $i;

@@ -29,7 +29,7 @@
  *-----------------------------------------------------------------*/
 function lti_add_consumer() {
 
-  global $wpdb;
+  global $lti_db_connector;
 
   $options = get_site_option('lti_choices');
 
@@ -62,7 +62,7 @@ function lti_add_consumer() {
   $type = "input";
 
   if ($editmode) {
-    $consumer = new LTI_Tool_Consumer($_REQUEST['lti'], array($wpdb->base_prefix));
+    $consumer = new LTI_Tool_Consumer($_REQUEST['lti'], $lti_db_connector);
   }
   ?>
 

@@ -194,8 +194,8 @@ class LTI_List_Keys extends WP_List_Table {
    * @uses $this->set_pagination_args()
    ---------------------------------------------------------------*/
   function prepare_items($per_page) {
-    global $wpdb;
-    //global $lti_db_connector;
+    //global $wpdb;
+    global $lti_db_connector;
 
    /**
     * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -227,7 +227,7 @@ class LTI_List_Keys extends WP_List_Table {
      */
 
     // Get the context
-    $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], array($wpdb->base_prefix));
+    $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], $lti_db_connector);
     $resource = new LTI_Resource_Link($consumer, $_SESSION[LTI_SESSION_PREFIX . 'resourceid']);
 
     $lti_shares = $resource->getShares();

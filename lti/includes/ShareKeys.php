@@ -26,11 +26,11 @@
 
 function lti_create_share_key() {
 
-  global $current_user, $wpdb;
+  global $current_user, $lti_db_connector;
   //global $lti_db_connector;
 
   // Get the context
-  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], array($wpdb->base_prefix));
+  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], $lti_db_connector);
   //$consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], $lti_db_connector);
   $resource = new LTI_Resource_Link($consumer, $_SESSION[LTI_SESSION_PREFIX . 'resourceid']);
 
