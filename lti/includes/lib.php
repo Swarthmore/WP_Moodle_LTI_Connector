@@ -32,7 +32,7 @@ require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'lib' . DIRECTOR
 
 global $wpdb;
 
-$lti_db_connector = LTI_Data_Connector::getDataConnector($wpdb->base_prefix, $wpdb->dbh);
+//$lti_db_connector = LTI_Data_Connector::getDataConnector($wpdb->base_prefix, $wpdb->dbh);
 
 /*-------------------------------------------------------------------
  * LTI_WP_User - a local smaller definition of the LTI_User that
@@ -46,7 +46,7 @@ class LTI_WP_User {
   public $firstname;
   public $lastname;
   public $fullname;
-  //public $email;
+  public $email;
   public $roles;
   public $staff = FALSE;
   public $learner = FALSE;
@@ -78,7 +78,7 @@ class LTI_WP_User {
       $this->firstname = $lti_user_from_consumer->firstname;
       $this->lastname = $lti_user_from_consumer->lastname;
       $this->fullname = $lti_user_from_consumer->fullname;
-      //$this->email = $lti_user_from_consumer->email;
+      $this->email = $lti_user_from_consumer->email;
       $role_name = '';
       if (!empty($lti_user_from_consumer->roles)) {
         foreach ($lti_user_from_consumer->roles as $role) {
@@ -115,9 +115,10 @@ class LTI_WP_User {
  ------------------------------------------------------------------*/
 function lti_delete($key) {
 
-  global $wpdb, $lti_db_connector;
+  global $wpdb;
+  //global $lti_db_connector;
 
-  $consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($key, array($wpdb->prefix));
   $consumer->delete();
 
   // Now delete the blogs associated with this key. The WP function that lists all
@@ -141,10 +142,10 @@ function lti_delete($key) {
  *  $key - key for consumer
  ------------------------------------------------------------------*/
 function lti_set_enable($key, $enable) {
+  global $wpdb;
+  //global $lti_db_connector;
 
-  global $lti_db_connector;
-
-  $consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($key, array($wpdb->prefix));
   $consumer->enabled = $enable;
   $consumer->save();
 }
@@ -157,9 +158,10 @@ function lti_set_enable($key, $enable) {
  ------------------------------------------------------------------*/
 function lti_get_enabled_state($key) {
 
-  global $lti_db_connector;
+  global $wpdb;
+  //global $lti_db_connector;
 
-  $consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($key, $wpdb->prefix);
 
   return $consumer->enabled;
 }
@@ -176,6 +178,7 @@ function lti_create_db() {
   $sql = 'CREATE TABLE IF NOT EXISTS ' . $prefix . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' (' .
          'consumer_key varchar(255) NOT NULL, ' .
          'name varchar(45) NOT NULL, ' .
+         'email_domain varchar(45) NOT NULL, ' .
          'secret varchar(32) NOT NULL, ' .
          'lti_version varchar(12) DEFAULT NULL, ' .
          'consumer_name varchar(255) DEFAULT NULL, ' .
@@ -280,7 +283,8 @@ function lti_create_db() {
  ------------------------------------------------------------------*/
 function lti_update($choice) {
 
-  global $blog_id, $wpdb, $lti_db_connector;
+  global $blog_id, $wpdb;
+  //global $lti_db_connector;
 
   // Add users
   $add_users = unserialize($_SESSION[LTI_SESSION_PREFIX . 'provision']);
@@ -367,8 +371,10 @@ function lti_update($choice) {
     }
   }
 
+  global $wpdb;
+
   // Get the consumer
-  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], array($wpdb->base_prefix));
   $resource = new LTI_Resource_Link($consumer, $_SESSION[LTI_SESSION_PREFIX . 'resourceid']);
 
   if ($resource->hasSettingService()) {
@@ -386,9 +392,10 @@ function lti_update($choice) {
  ------------------------------------------------------------------*/
 function lti_set_share($key, $id, $action) {
 
-  global $lti_db_connector;
+  global $wpdb;
+  //global $lti_db_connector;
 
-  $consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($key, array($wpdb->base_prefix));
   $context = new LTI_Resource_Link($consumer, $id);
 
   $context->share_approved = $action;
@@ -404,9 +411,10 @@ function lti_set_share($key, $id, $action) {
  ------------------------------------------------------------------*/
 function lti_delete_share($key, $id) {
 
-  global $lti_db_connector;
+  //global $lti_data_connector
+  global $wpdb;
 
-  $consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($key, array($wpdb->base_prefix));
   $context = new LTI_Resource_Link($consumer, $id);
 
   $context->delete();
@@ -421,9 +429,10 @@ function lti_delete_share($key, $id) {
  ------------------------------------------------------------------*/
 function lti_get_share_enabled_state($key) {
 
-  global $lti_db_connector;
+  //global $lti_db_connector;
+  global $wpdb;
 
-  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'key'], array($wpdb->base_prefix)); 
   $resource = new LTI_Resource_Link($consumer, $_SESSION[LTI_SESSION_PREFIX . 'resourceid']);
   $shares = $resource->getShares();
   foreach ($shares as $share) {
@@ -477,4 +486,31 @@ function lti_reset_session() {
   }
 }
 
+//Slugify function was borrowed from Symfony's Jobeet tutorial http://symfony.com/legacy/doc/jobeet/1_2?orm=Propel
+
+function slugify($text)
+{
+  // replace non letter or digits by -
+  $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+
+  // trim
+  $text = trim($text, '-');
+
+  // transliterate
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+  // lowercase
+  $text = strtolower($text);
+
+  // remove unwanted characters
+  $text = preg_replace('~[^-\w]+~', '', $text);
+
+  if (empty($text))
+  {
+    return 'n-a';
+  }
+
+  return $text;
+}
+  
 ?>
