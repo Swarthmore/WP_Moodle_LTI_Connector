@@ -30,7 +30,8 @@
  ------------------------------------------------------------------*/
 function lti_sync_enrolments() {
 
-  global $blog_id, $lti_db_connector;
+  global $blog_id, $wpdb;
+  //global $lti_db_connector;
 
   // Load class
   require_once('LTI_User_List_Table.php');
@@ -60,8 +61,8 @@ function lti_sync_enrolments() {
   // Get instance of LTI_User_List_Table and get the current action
   $ltiuser = new LTI_User_List_Table();
   $choice = $ltiuser->current_action();
-
-  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'userkey'], $lti_db_connector);
+  $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'userkey'], array($wpdb->base_prefix));
+  //$consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'userkey'], $lti_db_connector);
   $resource_link = new LTI_Resource_Link($consumer, $_SESSION[LTI_SESSION_PREFIX . 'userresourcelink']);
 
   if (!$resource_link->hasMembershipsService()) {

@@ -24,11 +24,15 @@
  *    1.1.00  14-Jan-15  Updated for later releases of WordPress
  */
 
+global $wpdb;
+
 require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . DIRECTORY_SEPARATOR . 'wp-admin' . DIRECTORY_SEPARATOR . 'admin.php';
 require_once 'lib.php';
 
 $key = $_GET['lti'];
-$consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
+$consumer = new LTI_Tool_Consumer($key, array($wpdb->base_prefix));
+
+//$consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
 
 $filename = $consumer->name;
 $sanitised = preg_replace('/[^_a-zA-Z0-9-]/','', $filename)  . '.xml';
