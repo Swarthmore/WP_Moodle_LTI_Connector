@@ -1,7 +1,7 @@
 <?php
 /*
  *  wordpress-lti - WordPress module to add LTI support
- *  Copyright (C) 2015  Simon Booth, Stephen P Vickers
+ *  Copyright (C) 2019
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@
  *-----------------------------------------------------------------*/
 function lti_do_connect($tool_provider) {
 
+  global $wpdb;
+
   // If multisite support isn't in play, go home
   if (!is_multisite()) {
     $tool_provider->message = __('The LTI Plugin requires a Multisite installation of WordPress', 'lti-text');
@@ -41,7 +43,7 @@ function lti_do_connect($tool_provider) {
   }
 
   // Clear any existing connections
-  wp_logout();
+  //wp_logout();
 
   // Clear these before use
   $_SESSION[LTI_SESSION_PREFIX . 'return_url'] = '';
@@ -60,15 +62,51 @@ function lti_do_connect($tool_provider) {
   $options = get_site_option('lti_choices');
   $scope_userid = lti_get_scope($tool_provider->consumer->getKey());
   $user_login = $tool_provider->user->getID($scope_userid);
+  
+  
+  //Swat edit:
+	$idLoc = strpos(print_r($tool_provider->user,true), '[id:LTI_User:private] =>');
+	$idEOL = strpos(print_r($tool_provider->user,true), ')', $idLoc);
+	$whatwewant = substr(print_r($tool_provider->user,true), $idLoc+25,$idEOL);
+	$matches = array();
+		if (preg_match('/\d*/', $whatwewant, $matches)) {
+	}
+		if (sizeof($matches)>0){
+  			$moodleID = $matches[0];
+		}
+		else{
+			error_log("LTI Error: No Moodle ID found.");
+			$tool_provider->reason="No Moodle ID";
+			return FALSE;
+		}
+	error_log("!!!!!!!!!!!!!!!!!! Incoming Moodle User !!!!!!!!!!!!!!!!!!" . $moodleID);
+
   // Sanitize username stripping out unsafe characters
   $user_login = sanitize_user($user_login);
 
   // Apply the function pre_user_login before saving to the DB.
   $user_login = apply_filters('pre_user_login', $user_login);
 
+  //Swat Edit: array of Banned Users
+	$banned_users= array("www", "web", "root", "admin", "main", "invite", "administrator", "files", "blog");
+	$userEmail = $tool_provider->user->email;
+	$defaultEmailDomain = $tool_provider->consumer->email_domain;
+
+	list($emailUsername, $emailDomain) = explode('@', $tool_provider->user->email);
+	if ($emailDomain !== $defaultEmailDomain){
+		error_log("!!!!!!!!!!!!!!!!!! default domain is !!!!!!!!!!!!!!!!!!" . $defaultEmailDomain);
+		error_log("!!!!!!!!!!!!!!!!!!Not from default domain!!!!!!!!!!!!!!!!!!");
+    $user_login= $user_login . '-' . $moodleID;
+  }
+    
   // Check if this username, $user_login, is already defined
   $user = get_user_by('login', $user_login);
 
+
+	if (!filter_var($tool_provider->user->email, FILTER_VALIDATE_EMAIL) || in_array($user_login, $banned_users))  {
+		wp_logout();
+  }
+  
   if ($user) {
     // If user exists, simply save the current details
     $result = wp_insert_user(
@@ -78,7 +116,7 @@ function lti_do_connect($tool_provider) {
             'user_nicename'=> $user_login,
             'first_name' => $tool_provider->user->firstname,
             'last_name' => $tool_provider->user->lastname,
-            //'user_email'=> $tool_provider->user->email,
+            'user_email'=> $tool_provider->user->email,
             //'user_url' => 'http://',
             'display_name' => $tool_provider->user->fullname
              )
@@ -92,7 +130,7 @@ function lti_do_connect($tool_provider) {
             'user_nicename'=> $user_login,
             'first_name' => $tool_provider->user->firstname,
             'last_name' => $tool_provider->user->lastname,
-            //'user_email'=> $tool_provider->user->email,
+            'user_email'=> $tool_provider->user->email,
             //'user_url' => 'http://',
             'display_name' => $tool_provider->user->fullname
              )
@@ -121,6 +159,9 @@ function lti_do_connect($tool_provider) {
   $context_id = $tool_provider->context->getId();
   $resource_id = $tool_provider->resource_link->getId();
 
+  //Swat Edit to get contect label
+  $context_label = slugify($tool_provider->resource_link->context_label);
+
   // Create blog
   $use_context = FALSE;
   if (!empty($context_id)) $use_context = ($tool_provider->resource_link->getSetting('custom_use_context') == 'true') ? TRUE : FALSE;
@@ -131,7 +172,10 @@ function lti_do_connect($tool_provider) {
     $path = $key . '_' . $context_id;
   } else {
     // Create new blog, if does not exist. Note this gives one blog per resource_id
-    $path = $key . $resource_id;
+    //$path = $key . $resource_id;
+
+    //swat Edit to get $content_label $path = $key . $resource_id;
+  	$path = $context_label;
   }
 
   // Replace any non-allowed characters in WordPress with -
