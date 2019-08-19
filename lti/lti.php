@@ -55,7 +55,7 @@ if (!session_id()) session_start();
  -------------------------------------------------------------------*/
 function lti_parse_request($wp) {
 
-  global $lti_db_connector;
+  global $wpdb;
 
   if (empty($_POST['lti_message_type'])) return FALSE;
 
@@ -66,7 +66,7 @@ function lti_parse_request($wp) {
   lti_strip_magic_quotes();
 
   // Do the necessary
-  $tool = new LTI_Tool_Provider('lti_do_connect', $lti_db_connector);
+  $tool = new LTI_Tool_Provider('lti_do_connect', array($wpdb->base_prefix));
   $tool->setParameterConstraint('resource_link_id', TRUE, 40);
   $tool->setParameterConstraint('user_id', TRUE);
 
@@ -130,12 +130,12 @@ function lti_register_user_submenu_page() {
   // appearing on the main site (/)
   if (is_main_site()) return;
 
-  global $current_user, $lti_options_page, $lti_db_connector;
+  global $current_user, $lti_options_page, $wpdb;
   // Check whether this blog is LTI, if not return
   if (get_option('ltisite') == 1) {
 
     // Sort out consumer instance and membership service stuff
-    $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'userkey'], $lti_db_connector);
+    $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'userkey'], array($wpdb->base_prefix));
     $resource_link = new LTI_Resource_Link($consumer, $_SESSION[LTI_SESSION_PREFIX . 'userresourcelink']);
 
     // If there is a membership service then offer appropriate options
@@ -399,6 +399,10 @@ function lti_options() {
             <legend class="screen-reader-text">
               <span><?php _e('Default Username Format', 'lti-text') ?></span>
             </legend>
+            <label for="lti_scope4">
+              <input name="lti_choices[scope]" type="radio" id="lti_scope4" value="4" <?php checked('4', $options['scope']); ?> />
+              <?php _e('Global: Use Email Only', 'lti-text'); ?>
+            </label><br />
             <label for="lti_scope3">
               <input name="lti_choices[scope]" type="radio" id="lti_scope3" value="3" <?php checked('3', $options['scope']); ?> />
               <?php _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text'); ?>
