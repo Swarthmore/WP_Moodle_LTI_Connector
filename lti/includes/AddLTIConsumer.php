@@ -29,7 +29,7 @@
  *-----------------------------------------------------------------*/
 function lti_add_consumer() {
 
-  global $lti_db_connector;
+  global $wpdb;
 
   $options = get_site_option('lti_choices');
 
@@ -62,7 +62,7 @@ function lti_add_consumer() {
   $type = "input";
 
   if ($editmode) {
-    $consumer = new LTI_Tool_Consumer($_REQUEST['lti'], $lti_db_connector);
+    $consumer = new LTI_Tool_Consumer($_REQUEST['lti'], array($wpdb->base_prefix));
   }
   ?>
 
@@ -77,6 +77,18 @@ function lti_add_consumer() {
     </th>
     <td>
       <input id="lti_name" type="text" aria-required="true" value="<?php echo esc_attr($consumer->name); ?>" name="lti_name" class="regular-text">
+    </td>
+  </tr>
+
+	<tr class="form-field form-required">
+    <th scope="row">
+      <label for="lti_email_domain" id="lti_email_domain_text">
+        <?php _e('Primary Email Domain', 'lti-text'); ?>
+        <span class="description"><?php _e('(The primary domain you expect your participant email addresses to originate from. If you expect student@example.edu, put example.edu in the field.)', 'lti-text'); ?></span>
+      </label>
+    </th>
+    <td>
+      <input id="lti_email_domain" type="text" aria-required="true" value="<?php echo esc_attr($consumer->email_domain); ?>" name="lti_email_domain" class="regular-text">
     </td>
   </tr>
 
@@ -176,6 +188,9 @@ function lti_add_consumer() {
     <td>
       <?php
         switch (lti_get_scope($consumer->getKey())) {
+        case '4' :
+        _e('Global: Use email only', 'lti-text');
+            break;
         case '3' :
           _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text');
           break;
@@ -199,6 +214,10 @@ function lti_add_consumer() {
         <legend class="screen-reader-text">
           <span><?php _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text') ?></span>
         </legend>
+        <label for="lti_scope4">
+          <input name="lti_scope" type="radio" id="lti_scope4" value="4" <?php checked('4', $options['scope']); ?> />
+          <?php _e('Global: Use Email Only', 'lti-text'); ?>
+        </label><br />
         <label for="lti_scope3">
           <input name="lti_scope" type="radio" id="lti_scope3" value="3" <?php checked('3', $options['scope']); ?> />
           <?php _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text'); ?>
