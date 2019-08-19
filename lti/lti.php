@@ -55,7 +55,7 @@ if (!session_id()) session_start();
  -------------------------------------------------------------------*/
 function lti_parse_request($wp) {
 
-  global $wpdb;
+  global $lti_db_connector;
 
   if (empty($_POST['lti_message_type'])) return FALSE;
 
@@ -66,7 +66,7 @@ function lti_parse_request($wp) {
   lti_strip_magic_quotes();
 
   // Do the necessary
-  $tool = new LTI_Tool_Provider('lti_do_connect', array($wpdb->base_prefix));
+  $tool = new LTI_Tool_Provider('lti_do_connect', $lti_db_connector);
   $tool->setParameterConstraint('resource_link_id', TRUE, 40);
   $tool->setParameterConstraint('user_id', TRUE);
 
@@ -130,7 +130,7 @@ function lti_register_user_submenu_page() {
   // appearing on the main site (/)
   if (is_main_site()) return;
 
-  global $current_user, $lti_options_page, $wpdb;
+  global $current_user, $lti_options_page, $lti_db_connector;
   // Check whether this blog is LTI, if not return
   if (get_option('ltisite') == 1) {
 
