@@ -160,8 +160,9 @@ function lti_do_connect($tool_provider) {
   $context_id = $tool_provider->context->getId();
   $resource_id = $tool_provider->resource_link->getId();
 
-  //Swat Edit to get contect label
-  $context_label = slugify($tool_provider->resource_link->context_label);
+  //Swat Edit to get context label
+  //where is context_label coming from?
+  //$context_label = slugify($tool_provider->resource_link->context_label);
 
   // Create blog
   $use_context = FALSE;
@@ -173,10 +174,9 @@ function lti_do_connect($tool_provider) {
     $path = $key . '_' . $context_id;
   } else {
     // Create new blog, if does not exist. Note this gives one blog per resource_id
-    //$path = $key . $resource_id;
-
+    $path = slugify($tool_provider->resource_link->title);
     //swat Edit to get $content_label $path = $key . $resource_id;
-  	$path = $context_label;
+  	//$path = $context_label;
   }
 
   // Replace any non-allowed characters in WordPress with -

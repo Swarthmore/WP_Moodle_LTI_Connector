@@ -409,7 +409,7 @@ function lti_set_share($key, $id, $action) {
  ------------------------------------------------------------------*/
 function lti_delete_share($key, $id) {
 
-  global $lti_data_connector;
+  global $lti_db_connector;
   //global $wpdb;
 
   $consumer = new LTI_Tool_Consumer($key, $lti_db_connector);
