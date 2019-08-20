@@ -148,8 +148,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
       $result = $this->db->prepare($sql);
       if ($result) {
-        $ok = $result->bind_param('ssssssssiisssss', $key, $consumer->name, $consumer->email_domain, $consumer->secret, $consumer->lti_version,
-           $consumer->consumer_name, $consumer->consumer_version, $consumer->consumer_guid, $consumer->css_path, $protected, $enabled, $from, $until, $last, $now, $now);
+        $ok = $result->bind_param('sssssssssiisssss', $key, $consumer->name, $consumer->email_domain, $consumer->secret, $consumer->lti_version,$consumer->consumer_name, $consumer->consumer_version, $consumer->consumer_guid, $consumer->css_path, $protected, $enabled, $from, $until, $last, $now, $now);
       }
     } else {
       $sql = "UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' SET ' .
@@ -158,7 +157,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
              'WHERE consumer_key = ?';
       $result = $this->db->prepare($sql);
       if ($result) {
-        $ok = $result->bind_param('sssssssiisssss', $consumer->name, $consumer->email_domain, $consumer->secret, $consumer->lti_version,
+        $ok = $result->bind_param('ssssssssiisssss', $consumer->name, $consumer->email_domain, $consumer->secret, $consumer->lti_version,
            $consumer->consumer_name, $consumer->consumer_version, $consumer->consumer_guid, $consumer->css_path, $protected, $enabled, $from, $until, $last, $now, $key);
       }
     }
@@ -283,6 +282,8 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     $sql = 'SELECT consumer_key, name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
            "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' ' .
            'ORDER BY name';
+
+    // we aren't getting the proper db here.. db is interpreted as a strings
     $result = $this->db->prepare($sql);
     if ($result) {
       if ($result->execute()) {

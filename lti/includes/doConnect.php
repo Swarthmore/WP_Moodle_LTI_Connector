@@ -68,16 +68,19 @@ function lti_do_connect($tool_provider) {
 	$idEOL = strpos(print_r($tool_provider->user,true), ')', $idLoc);
 	$whatwewant = substr(print_r($tool_provider->user,true), $idLoc+25,$idEOL);
 	$matches = array();
-		if (preg_match('/\d*/', $whatwewant, $matches)) {
-	}
-		if (sizeof($matches)>0){
-  			$moodleID = $matches[0];
-		}
-		else{
-			error_log("LTI Error: No Moodle ID found.");
-			$tool_provider->reason="No Moodle ID";
-			return FALSE;
-		}
+  
+  if (preg_match('/\d*/', $whatwewant, $matches)) {}
+  
+  if (sizeof($matches)>0){
+    $moodleID = $matches[0];
+  }
+  
+  else {
+    error_log("LTI Error: No Moodle ID found.");
+    $tool_provider->reason="No Moodle ID";
+    return FALSE;
+  }
+
 	//error_log("!!!!!!!!!!!!!!!!!! Incoming Moodle User !!!!!!!!!!!!!!!!!!" . $moodleID);
 
   // Sanitize username stripping out unsafe characters
@@ -91,10 +94,10 @@ function lti_do_connect($tool_provider) {
 	$userEmail = $tool_provider->user->email;
 	$defaultEmailDomain = $tool_provider->consumer->email_domain;
 
-	list($emailUsername, $emailDomain) = explode('@', $tool_provider->user->email);
+  list($emailUsername, $emailDomain) = explode('@', $tool_provider->user->email);
+  
 	if ($emailDomain !== $defaultEmailDomain){
-		// error_log("!!!!!!!!!!!!!!!!!! default domain is !!!!!!!!!!!!!!!!!!" . $defaultEmailDomain);
-		// error_log("!!!!!!!!!!!!!!!!!!Not from default domain!!!!!!!!!!!!!!!!!!");
+    error_log("User is not from default domain: " . $defaultEmailDomain);
     $user_login= $user_login . '-' . $moodleID;
   }
     

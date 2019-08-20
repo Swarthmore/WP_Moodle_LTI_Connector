@@ -209,11 +209,12 @@ class LTI_Tool_Provider {
 // For backward compatibility the parameters may be in the opposite order, but the recommended practice is to just pass a data connector object and
 // override the callback class methods instead of using callback method names.
 
+    // This whole check is really, really stupid
     $reverse = FALSE;
     if (!is_string($data_connector) || (!is_null($callbackHandler) && !is_string($callbackHandler))) {
       if (is_object($callbackHandler)) {
         $reverse = TRUE;
-      } else if (is_array($data_connector) && array_diff_key($data_connector ,array_keys(array_keys($data_connector)))) {
+      } else if (is_array($data_connector) && array_diff_key($data_connector, array_keys(array_keys($data_connector)))) {
         $reverse = TRUE;
       } else if (!is_array($data_connector) && is_array($callbackHandler)) {
         $reverse = TRUE;
@@ -226,6 +227,7 @@ class LTI_Tool_Provider {
       $callbackHandler = $data_connector;
       $data_connector = $temp;
     }
+
     $this->constraints = array();
     $this->context = &$this->resource_link;
     $this->callbackHandler = array();
@@ -3769,6 +3771,7 @@ abstract class LTI_Data_Connector {
  */
   static function getDataConnector($data_connector, $db = NULL, $type = NULL) {
 
+    // seriously, who coded this mess...
     if (!is_null($data_connector)) {
       if (!is_object($data_connector) || !is_subclass_of($data_connector, get_class())) {
         $prefix = NULL;
@@ -3795,7 +3798,7 @@ abstract class LTI_Data_Connector {
         if (!is_null($db)) {
           if (is_string($db)) {
             $type = $db;
-            $db = NULL;
+            //$db = NULL;
           } else if (is_null($type)) {
             if (is_object($db)) {
               $type = get_class($db);
@@ -3808,9 +3811,9 @@ abstract class LTI_Data_Connector {
           $type = 'mysql';
         }
         $type = strtolower($type);
-        if ($type == 'mysql') {
-          $db = NULL;
-        }
+        // if ($type == 'mysql') {
+        //   $db = NULL;
+        // }
         $type = "LTI_Data_Connector_{$type}";
         require_once("{$type}.php");
         if (is_null($db)) {

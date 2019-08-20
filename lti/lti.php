@@ -65,7 +65,7 @@ function lti_parse_request($wp) {
   // Deal with magic quotes before they cause OAuth to fail
   lti_strip_magic_quotes();
 
-  // Do the necessary
+  // Kindly do the needful
   $tool = new LTI_Tool_Provider('lti_do_connect', $lti_db_connector);
   $tool->setParameterConstraint('resource_link_id', TRUE, 40);
   $tool->setParameterConstraint('user_id', TRUE);
