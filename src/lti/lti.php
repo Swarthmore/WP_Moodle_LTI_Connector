@@ -1,18 +1,18 @@
 <?php
 /*
-Plugin Name: LTI
-Plugin URI: https://github.com/devnoot/lti.git
-Description: This plugin allows WordPress to be integrated with on-line courses using the IMS Learning Tools Interoperability (LTI) specification.
-Version: 1.0
+Plugin Name: WP_Moodle_LTI_Connector
+Plugin URI: https://github.com/devnoot/WPMU_LTI_Connector.git
+Description: This plugin allows WordPress to be integrated with Moodle courses using the IMS Learning Tools Interoperability (LTI) specification.
+Version: 1.1
 Network: true
-Author: devnoot, Swarthmore College, Simon Booth, Stephen Vickers
-Author URI: http://denoot.com/
+Author: Swarthmore College, Simon Booth, Stephen Vickers
+Author URI: http://www.swarthmore.edu/
 License: GPL2
 */
 
 /*
- *  lti - WordPress module to add LTI support
- *  Copyright (C) 2019 devnoot, Swarthmore College, Simon Booth, Stephen P Vickers
+ *  wordpress-lti - WordPress module to add LTI support
+ *  Copyright (C) 2015  Simon Booth, Stephen P Vickers
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,8 +28,12 @@ License: GPL2
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
+ *  Contact: s.p.booth@stir.ac.uk
+ *
  *  Version history:
- *    1.0.00  ??-Aug-19  Initial release
+ *    1.0.00  18-Apr-13  Initial release
+ *    1.1.00  14-Jan-15  Updated for later releases of WordPress
+ *    1.2.00  14-Apr-16  Updated for MySQL 5.1.72 (works with earlier)
  */
 
 /*-------------------------------------------------------------------
