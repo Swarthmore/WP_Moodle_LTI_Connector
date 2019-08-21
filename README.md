@@ -18,6 +18,9 @@ DROP TABLE wp_lti_context;
 DROP TABLE wp_lti_consumer;
 ```
 
+## Building
+If you intend to fork or modifiy this code, a build script is included to bundle your code. Once edits are made, just run `build.sh` to bundle the plugin for consumption with WordPress.
+
 ## Some caveats
 
 - This plugin is intended for WordPress multisite use **only**.

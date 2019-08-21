@@ -139,7 +139,7 @@ function lti_register_user_submenu_page() {
   if (get_option('ltisite') == 1) {
 
     // Sort out consumer instance and membership service stuff
-    $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'userkey'], array($wpdb->base_prefix));
+    $consumer = new LTI_Tool_Consumer($_SESSION[LTI_SESSION_PREFIX . 'userkey'], $lti_db_connector);
     $resource_link = new LTI_Resource_Link($consumer, $_SESSION[LTI_SESSION_PREFIX . 'userresourcelink']);
 
     // If there is a membership service then offer appropriate options
