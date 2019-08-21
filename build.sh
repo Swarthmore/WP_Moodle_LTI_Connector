@@ -2,4 +2,5 @@
 rm dist/lti.zip
 
 # bundle the new build
-zip -rT dist/lti.zip src/lti
+cd src
+zip -rT ../dist/lti.zip lti/
